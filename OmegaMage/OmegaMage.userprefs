@@ -2,7 +2,9 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\__Scripts\Tile.cs">
     <Files>
-      <File FileName="Assets\__Scripts\Tile.cs" Line="34" Column="41" />
+      <File FileName="Assets\__Scripts\Tile.cs" Line="44" Column="2" />
+      <File FileName="Assets\__Scripts\LayoutTiles.cs" Line="135" Column="27" />
+      <File FileName="Assets\__Scripts\Mage.cs" Line="11" Column="12" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
