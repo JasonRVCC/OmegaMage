@@ -4,9 +4,8 @@
     <Files>
       <File FileName="Assets\__Scripts\ProtoTools\PT_MonoBehaviour.cs" Line="8" Column="30" />
       <File FileName="Assets\__Scripts\EnemyBug.cs" Line="147" Column="52" />
-      <File FileName="Assets\__Scripts\FireGroundSpell.cs" Line="59" Column="62" />
-      <File FileName="Assets\Resources\Rooms.xml" Line="21" Column="4" />
-      <File FileName="Assets\__Scripts\Mage.cs" Line="401" Column="43" />
+      <File FileName="Assets\__Scripts\Mage.cs" Line="409" Column="38" />
+      <File FileName="Assets\__Scripts\EnemySpiker.cs" Line="67" Column="4" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -2,12 +2,27 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class EnemyBug : PT_MonoBehaviour
+public class EnemyBug : PT_MonoBehaviour, Enemy
 {
-	public float speed = 0.5f;
-	public float health = 10;
-	public float damageScale = 0.8f; 
-	public float damageScaleDuration = 0.25f; 
+	[SerializeField]
+	private float _touchDamage = 1;
+	public float touchDamage
+	{
+		get { return (_touchDamage); }
+		set { _touchDamage = value; }
+	}
+
+	public string typeString
+	{
+		get { return(roomXMLString);}
+		set { roomXMLString = value;}
+	}
+
+	public string	roomXMLString;
+	public float 	speed = 0.5f;
+	public float 	health = 10;
+	public float 	damageScale = 0.8f; 
+	public float 	damageScaleDuration = 0.25f; 
 
 	public bool ________________;
 
