@@ -11,6 +11,17 @@ public enum MPhase
 	drag
 }
 
+//Element Types for spells
+public enum ElementType
+{
+	earth,
+	water,
+	air,
+	fire,
+	aether,
+	none
+}
+
 //MouseInfo stores mouse information
 [System.Serializable]
 public class MouseInfo
@@ -36,6 +47,7 @@ public class MouseInfo
 	}
 }
 
+
 public class Mage : PT_MonoBehaviour {
 	static public Mage S;
 	static public bool DEBUG = true;
@@ -48,6 +60,11 @@ public class Mage : PT_MonoBehaviour {
 
 	public float 		speed = 2;
 
+	public GameObject[] elementPrefabs; 
+	public float 		elementRotDist = 0.5f; 
+	public float 		elementRotSpeed = 0.5f; 
+	public int 			maxNumSelectedElements = 1;
+	
 	public bool ________________;
 
 	public MPhase 			mPhase = MPhase.idle;
@@ -56,6 +73,8 @@ public class Mage : PT_MonoBehaviour {
 	public bool 			walking = false; 
 	public Vector3 			walkTarget; 
 	public Transform 		characterTrans; 
+
+	public List<Element> 	selectedElements = new List<Element>(); 
 
 
 	void Awake()
@@ -106,8 +125,14 @@ public class Mage : PT_MonoBehaviour {
 				{
 					mPhase = MPhase.drag;
 				}
+
+				if (selectedElements.Count == 0)
+				{ 
+					mPhase = MPhase.drag; //**
+				}
 			}
 		}
+
 		if (mPhase == MPhase.drag)
 		{ 
 			AddMouseInfo();
@@ -121,6 +146,8 @@ public class Mage : PT_MonoBehaviour {
 				MouseDrag(); 
 			}
 		}
+
+		OrbitSelectedElements();
 	}
 
 	//Get's info from the mouse, adds it to mouseInfos, and returns it
@@ -247,5 +274,65 @@ public class Mage : PT_MonoBehaviour {
 	{
 		GameObject go = Instantiate(tapIndicatorPrefab) as GameObject;
 		go.transform.position = loc;
+	}
+
+
+	public void SelectElement(ElementType elType)
+	{
+		if (elType == ElementType.none)
+		{ 
+			ClearElements(); 
+			return; 
+		}
+
+		if (maxNumSelectedElements == 1)
+		{
+			ClearElements(); 
+		}
+
+		if (selectedElements.Count >= maxNumSelectedElements) 
+		{ return; }
+
+		GameObject go = Instantiate(elementPrefabs[(int)elType]) as GameObject;
+
+		Element el = go.GetComponent<Element>();
+		el.transform.parent = this.transform;
+
+		selectedElements.Add(el);
+	}
+	
+	public void ClearElements()
+	{
+		foreach (Element el in selectedElements)
+		{
+			Destroy(el.gameObject);
+		}
+		selectedElements.Clear(); // and clear the list
+	}
+	
+	void OrbitSelectedElements()
+	{
+		if (selectedElements.Count == 0) 
+		{ return; }
+
+		Element el;
+		Vector3 vec;
+		float theta0, theta;
+		float tau = Mathf.PI * 2; //tau is 360 degress in radians (6.283...)
+
+		float rotPerElement = tau / selectedElements.Count;
+
+		theta0 = elementRotSpeed * Time.time * tau;
+
+		for (int i = 0; i < selectedElements.Count; i++)
+		{
+			//Determine the rotation angle
+			theta = theta0 + i * rotPerElement;
+			el = selectedElements[i];
+			vec = new Vector3(Mathf.Cos(theta), Mathf.Sin(theta), 0);
+			vec *= elementRotDist;
+			vec.z = -0.5f;
+			el.lPos = vec; 
+		}
 	}
 }
