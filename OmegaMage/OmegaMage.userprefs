@@ -1,13 +1,17 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\__Scripts\FireGroundSpell.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\__Scripts\LayoutTiles.cs">
     <Files>
-      <File FileName="Assets\__Scripts\Mage.cs" Line="294" Column="29" />
-      <File FileName="Assets\__Scripts\FireGroundSpell.cs" Line="52" Column="24" />
+      <File FileName="Assets\__Scripts\LayoutTiles.cs" Line="172" Column="21" />
+      <File FileName="Assets\__Scripts\ProtoTools\PT_XMLReader.cs" Line="1" Column="1" />
+      <File FileName="Assets\Resources\Rooms.xml" Line="21" Column="4" />
+      <File FileName="Assets\__Scripts\ProtoTools\PT_MonoBehaviour.cs" Line="8" Column="30" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="E:\OmegaMage\OmegaMage\Assets\__Scripts\LayoutTiles.cs" line="97" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

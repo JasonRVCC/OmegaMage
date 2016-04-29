@@ -95,13 +95,13 @@ public class LayoutTiles : MonoBehaviour {
 
 		//scan through each tile
 		for (int y=0; y < roomRows.Length; y++) {
-			for(int x=0; x < roomRows[y].Length; x++){
+			for (int x=0; x < roomRows[y].Length; x++) {
 				height = 0;
 				tileTexStr = floorTexStr;
 
 				//Get tile character
-				type = rawType = roomRows[y][x].ToString();
-				switch(rawType){
+				type = rawType = roomRows [y] [x].ToString ();
+				switch (rawType) {
 				case "":  //Empty
 				case "_": //Empty
 					continue;
@@ -114,24 +114,23 @@ public class LayoutTiles : MonoBehaviour {
 					break;
 
 				default:
-					type=".";
+					type = ".";
 					break;
 				}
 
 				//Set floor/wall texture
-				if(type == "."){
+				if (type == ".") {
 					tileTexStr = floorTexStr;
-				}
-				else if(type == "|"){
+				} else if (type == "|") {
 					tileTexStr = wallTexStr;
 				}
 
 				//instantiate a new tile
-				go = Instantiate(tilePrefab) as GameObject;
-				ti = go.GetComponent<Tile>();
+				go = Instantiate (tilePrefab) as GameObject;
+				ti = go.GetComponent<Tile> ();
 				ti.transform.parent = tileAnchor;
-				ti.pos= new Vector3(x,maxY-y,0);
-				tiles[x,y] = ti;
+				ti.pos = new Vector3 (x, maxY - y, 0);
+				tiles [x, y] = ti;
 
 				//Set tile fields
 				ti.type = type;
@@ -139,13 +138,13 @@ public class LayoutTiles : MonoBehaviour {
 				ti.tex = tileTexStr;
 
 				//if type is still rawtype, continue
-				if(rawType == type) continue;
+				if (rawType == type)
+				{ continue; }
 
 				//Check for specific entities
-				switch(rawType){
+				switch (rawType) {
 				case "X":
-					if (firstRoom)
-					{
+					if (firstRoom) {
 						Mage.S.pos = ti.pos; 
 						roomNumber = rNumStr;
 						firstRoom = false;
@@ -168,17 +167,18 @@ public class LayoutTiles : MonoBehaviour {
 				case "D":
 				case "E":
 				case "F":
-					GameObject pGO = Instantiate(portalPrefab) as GameObject;
+					GameObject pGO = Instantiate (portalPrefab) as GameObject;
 					Portal p = pGO.GetComponent<Portal>();
 					p.pos = ti.pos;
 					p.transform.parent = tileAnchor;
 					p.toRoom = rawType;
-					portals.Add(p);
+					portals.Add (p);
 					break;
 				}
 
 				//<=TO BE CONTINUED===
 			}
+		}
 
 			//Position the Mage
 			foreach (Portal p in portals)
@@ -191,9 +191,8 @@ public class LayoutTiles : MonoBehaviour {
 					firstRoom = false;
 				}
 			}
-			
-			roomNumber = rNumStr;
-		}
+
+		roomNumber = rNumStr;
 	}
 
 	public void BuildRoom(string rNumStr) 
