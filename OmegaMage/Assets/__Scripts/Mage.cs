@@ -64,11 +64,22 @@ public class Mage : PT_MonoBehaviour {
 	public float 		elementRotDist = 0.5f; 
 	public float 		elementRotSpeed = 0.5f; 
 	public int 			maxNumSelectedElements = 1;
+	public Color[] 		elementColors;
+
+	//Min and max distance between line points
+	public float 		lineMinDelta = 0.1f; 
+	public float 		lineMaxDelta = 0.5f; 
+	public float 		lineMaxLength = 8f; 
 	
 	public bool ________________;
 
+	public float			totalLineLength;
+	public List<Vector3> 	linePts; 
+	protected LineRenderer 	liner; 
+	protected float 		lineZ = -0.1f; 
 	public MPhase 			mPhase = MPhase.idle;
 	public List<MouseInfo> 	mouseInfos = new List<MouseInfo>();
+	public string 			actionStartTag; //["Mage", "Ground", "Enemy"]
 
 	public bool 			walking = false; 
 	public Vector3 			walkTarget; 
@@ -83,9 +94,12 @@ public class Mage : PT_MonoBehaviour {
 		mPhase = MPhase.idle;
 
 		characterTrans = transform.Find("CharacterTrans");
+
+		liner = GetComponent<LineRenderer>();
+		liner.enabled = false;
 	}
-
-
+	
+	
 	void Update()
 	{
 		//Was mouse button 0 pressed or released this frame?
@@ -187,30 +201,74 @@ public class Mage : PT_MonoBehaviour {
 	void MouseDown()
 	{
 		if (DEBUG) print("Mage.MouseDown()");
-	}
 
+		GameObject clickedGO = mouseInfos[0].hitInfo.collider.gameObject;
+
+		GameObject taggedParent = Utils.FindTaggedParent(clickedGO);
+		if (taggedParent == null)
+		{
+			actionStartTag = "";
+		}
+		else
+		{
+			actionStartTag = taggedParent.tag;
+		}
+	}
+	
 	void MouseTap()
 	{
 		if (DEBUG) print("Mage.MouseTap()");
-		WalkTo(lastMouseInfo.loc);
-		ShowTap(lastMouseInfo.loc);
+
+		switch (actionStartTag)
+		{
+		case "Mage":
+			break;
+		case "Ground":
+			WalkTo(lastMouseInfo.loc); 
+			ShowTap(lastMouseInfo.loc);
+			break;
+		}
 	}
-		
+	
 	void MouseDrag()
 	{
 		if (DEBUG) print("Mage.MouseDrag()");
 
-		WalkTo(mouseInfos[mouseInfos.Count - 1].loc);
-	}
+		if (actionStartTag != "Ground") 
+		{ return;}
 
+		//Check if any elements are selected. If false, make the player move.
+		if (selectedElements.Count == 0)
+		{
+			WalkTo(mouseInfos[mouseInfos.Count - 1].loc);
+		}
+		else
+		{ 
+			AddPointToLiner(mouseInfos[mouseInfos.Count - 1].loc);
+		}
+	}
+	
 	void MouseDragUp()
 	{
 		if (DEBUG) print("Mage.MouseDragUp()");
+		
+		if (actionStartTag != "Ground") 
+		{ return;}
 
-		StopWalking();
+		//Check if any elements are selected. If false, the player is moving.
+		if (selectedElements.Count == 0)
+		{
+			StopWalking();
+		}
+		else
+		{
+			//TODO: Cast the Spell
+
+			ClearLiner();
+		}
 	}
-
-
+	
+	
 	public void WalkTo(Vector3 xTarget)
 	{
 		walkTarget = xTarget; 
@@ -334,5 +392,71 @@ public class Mage : PT_MonoBehaviour {
 			vec.z = -0.5f;
 			el.lPos = vec; 
 		}
+	}
+
+
+	//---------------- LineRenderer Code ----------------//
+
+	void AddPointToLiner(Vector3 pt)
+	{
+		pt.z = lineZ;
+
+		//linePts.Add(pt);
+		//UpdateLiner();
+
+		if (linePts.Count == 0)
+		{
+			linePts.Add(pt);
+			totalLineLength = 0;
+			return; 
+		}
+
+		if (totalLineLength > lineMaxLength) 
+		{ return; }
+
+		Vector3 pt0 = linePts[linePts.Count - 1]; 
+		Vector3 dir = pt - pt0;
+		float delta = dir.magnitude;
+		dir.Normalize();
+
+		totalLineLength += delta;
+
+		if (delta < lineMinDelta)
+		{ return; }
+
+		if (delta > lineMaxDelta)
+		{
+			//add extra points in between
+			float numToAdd = Mathf.Ceil(delta / lineMaxDelta);
+			float midDelta = delta / numToAdd;
+			Vector3 ptMid;
+			for (int i = 1; i < numToAdd; i++)
+			{
+				ptMid = pt0 + (dir * midDelta * i);
+				linePts.Add(ptMid);
+			}
+		}
+		linePts.Add(pt); 
+		UpdateLiner(); 
+	}
+	
+	public void UpdateLiner()
+	{
+		int el = (int)selectedElements[0].type;
+		
+		liner.SetColors(elementColors[el], elementColors[el]);
+		
+		liner.SetVertexCount(linePts.Count); //Set the number of vertices
+		for (int i = 0; i < linePts.Count; i++)
+		{
+			liner.SetPosition(i, linePts[i]);
+		}
+		liner.enabled = true; 
+	}
+
+	public void ClearLiner()
+	{
+		liner.enabled = false; 
+		linePts.Clear(); 
 	}
 }
