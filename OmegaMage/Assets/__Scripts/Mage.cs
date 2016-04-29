@@ -72,8 +72,20 @@ public class Mage : PT_MonoBehaviour {
 	public float 		lineMaxLength = 8f; 
 
 	public GameObject 	fireGroundSpellPrefab;
+
+	public float 		health = 4; 
+	public float 		damageTime = -100; 
+	public float 		knockbackDist = 1; 
+	public float 		knockbackDur = 0.5f; 
+	public float 		invincibleDur = 0.5f; 
+	public int 			invTimesToBlink = 4; 
 	
 	public bool ________________;
+
+	private bool invincibleBool = false;
+	private bool knockbackBool = false; 
+	private Vector3 knockbackDir; 
+	private Transform viewCharacterTrans; 
 
 	protected Transform 	spellAnchor;
 
@@ -98,6 +110,7 @@ public class Mage : PT_MonoBehaviour {
 		mPhase = MPhase.idle;
 
 		characterTrans = transform.Find("CharacterTrans");
+		viewCharacterTrans = characterTrans.Find ("View_Character");
 
 		liner = GetComponent<LineRenderer>();
 		liner.enabled = false;
@@ -324,6 +337,33 @@ public class Mage : PT_MonoBehaviour {
 
 	void FixedUpdate()
 	{ 
+		if (invincibleBool)
+		{ 
+			float blinkU = (Time.time - damageTime) / invincibleDur; 
+			blinkU *= invTimesToBlink; 
+			blinkU %= 1.0f; 
+
+			bool visible = (blinkU > 0.5f); 
+			if (Time.time - damageTime > invincibleDur)
+			{ 
+				invincibleBool = false; 
+				visible = true; 
+			} 
+
+			viewCharacterTrans.gameObject.SetActive(visible); 
+		} 
+
+		if (knockbackBool)
+		{ 
+			if (Time.time - damageTime > knockbackDur)
+			{ 
+				knockbackBool = false; 
+			} 
+			float knockbackSpeed = knockbackDist / knockbackDur; 
+			vel = knockbackDir * knockbackSpeed; 
+			return; 
+		}
+
 		if (walking)
 		{ 
 			if ((walkTarget - pos).magnitude < speed * Time.fixedDeltaTime)
@@ -355,6 +395,45 @@ public class Mage : PT_MonoBehaviour {
 				StopWalking();
 			}
 		}
+
+		EnemyBug bug = coll.gameObject.GetComponent<EnemyBug>(); //**
+
+		if (bug != null) CollisionDamage(otherGO);
+	}
+
+	void OnTriggerEnter(Collider other)
+	{
+		EnemySpiker spiker = other.GetComponent<EnemySpiker>();
+		if (spiker != null)
+		{
+			CollisionDamage(other.gameObject);
+		}
+	}
+	
+	void CollisionDamage(GameObject enemy)
+	{
+		if (invincibleBool) 
+		{return;}
+		
+		StopWalking();
+		ClearInput();
+
+		health -= 1;
+		if (health <= 0)
+		{
+			Die();
+			return;
+		}
+
+		damageTime = Time.time;
+		knockbackBool = true;
+		knockbackDir = (pos - enemy.transform.position).normalized;
+		invincibleBool = true;
+	}
+
+	void Die()
+	{
+		Application.LoadLevel(0);
 	}
 
 	public void ShowTap(Vector3 loc)
