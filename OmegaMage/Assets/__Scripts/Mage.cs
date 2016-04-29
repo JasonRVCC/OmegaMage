@@ -172,11 +172,15 @@ public class Mage : PT_MonoBehaviour {
 	void MouseDrag()
 	{
 		if (DEBUG) print("Mage.MouseDrag()");
+
+		WalkTo(mouseInfos[mouseInfos.Count - 1].loc);
 	}
 
 	void MouseDragUp()
 	{
 		if (DEBUG) print("Mage.MouseDragUp()");
+
+		StopWalking();
 	}
 
 
