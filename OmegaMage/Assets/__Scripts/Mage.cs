@@ -488,4 +488,9 @@ public class Mage : PT_MonoBehaviour {
 		liner.enabled = false; 
 		linePts.Clear(); 
 	}
+
+	public void ClearInput()
+	{
+		mPhase = MPhase.idle;
+	}
 }

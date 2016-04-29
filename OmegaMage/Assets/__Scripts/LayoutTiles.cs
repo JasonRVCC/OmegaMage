@@ -17,9 +17,11 @@ public class LayoutTiles : MonoBehaviour {
 	public string		roomNumber = "0";
 	public GameObject	tilePrefab;
 	public TileTex[]	tileTextures;
+	public GameObject 	portalPrefab;
 
 	public bool ______________________________;
 
+	private bool			firstRoom = true;
 	public PT_XMLReader		roomsXMLR;
 	public PT_XMLHashList	roomsXML;
 	public Tile[,]			tiles;
@@ -58,6 +60,19 @@ public class LayoutTiles : MonoBehaviour {
 
 	public void BuildRoom(PT_XMLHashtable room)
 	{
+		//destroy old tiles
+		foreach (Transform t in tileAnchor)
+		{ 
+			Destroy(t.gameObject);
+		}
+
+		//move the player out of the way and reset them
+		Mage.S.pos = Vector3.left * 1000;
+		Mage.S.ClearInput(); 
+
+		string rNumStr = room.att("num");
+
+
 		//get the texture names for the room
 		string floorTexStr = room.att ("floor");
 		string wallTexStr = room.att ("wall");
@@ -76,6 +91,7 @@ public class LayoutTiles : MonoBehaviour {
 		GameObject go;
 		int height;
 		float maxY = roomRows.Length - 1;
+		List<Portal> portals = new List<Portal> ();
 
 		//scan through each tile
 		for (int y=0; y < roomRows.Length; y++) {
@@ -128,12 +144,55 @@ public class LayoutTiles : MonoBehaviour {
 				//Check for specific entities
 				switch(rawType){
 				case "X":
-					Mage.S.pos = ti.pos;
+					if (firstRoom)
+					{
+						Mage.S.pos = ti.pos; 
+						roomNumber = rNumStr;
+						firstRoom = false;
+					}
+					break;
+
+				case "0": // These numbers are the room portals. They are hexadecimal
+				case "1": // This allows them to be placed in the Rooms.xml file
+				case "2":
+				case "3":
+				case "4":
+				case "5":
+				case "6":
+				case "7":
+				case "8":
+				case "9":
+				case "A":
+				case "B":
+				case "C":
+				case "D":
+				case "E":
+				case "F":
+					GameObject pGO = Instantiate(portalPrefab) as GameObject;
+					Portal p = pGO.GetComponent<Portal>();
+					p.pos = ti.pos;
+					p.transform.parent = tileAnchor;
+					p.toRoom = rawType;
+					portals.Add(p);
 					break;
 				}
 
 				//<=TO BE CONTINUED===
 			}
+
+			//Position the Mage
+			foreach (Portal p in portals)
+			{
+				if (p.toRoom == roomNumber || firstRoom)
+				{
+					Mage.S.StopWalking(); 
+					Mage.S.pos = p.pos; 
+					p.justArrived = true;
+					firstRoom = false;
+				}
+			}
+			
+			roomNumber = rNumStr;
 		}
 	}
 
@@ -155,4 +214,6 @@ public class LayoutTiles : MonoBehaviour {
 		}
 		BuildRoom(roomHT);
 	}
+
+
 }
