@@ -40,12 +40,13 @@ public class Mage : PT_MonoBehaviour {
 	static public Mage S;
 	static public bool DEBUG = true;
 
-	public float 	mTapTime = 0.1f; 
-	public float 	mDragDist = 5; 
+	public float 		mTapTime = 0.1f; 
+	public GameObject 	tapIndicatorPrefab;
+	public float 		mDragDist = 5; 
 
-	public float 	activeScreenWidth = 1; 
+	public float 		activeScreenWidth = 1; 
 
-	public float 	speed = 2;
+	public float 		speed = 2;
 
 	public bool ________________;
 
@@ -165,6 +166,7 @@ public class Mage : PT_MonoBehaviour {
 	{
 		if (DEBUG) print("Mage.MouseTap()");
 		WalkTo(lastMouseInfo.loc);
+		ShowTap(lastMouseInfo.loc);
 	}
 		
 	void MouseDrag()
@@ -235,5 +237,11 @@ public class Mage : PT_MonoBehaviour {
 				StopWalking();
 			}
 		}
+	}
+
+	public void ShowTap(Vector3 loc)
+	{
+		GameObject go = Instantiate(tapIndicatorPrefab) as GameObject;
+		go.transform.position = loc;
 	}
 }
