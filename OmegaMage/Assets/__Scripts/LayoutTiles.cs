@@ -27,7 +27,7 @@ public class LayoutTiles : MonoBehaviour {
 
 	//Methods
 
-	void Awake()
+	void Start()
 	{
 		S = this;
 
