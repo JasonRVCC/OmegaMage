@@ -45,16 +45,24 @@ public class Mage : PT_MonoBehaviour {
 
 	public float 	activeScreenWidth = 1; 
 
+	public float 	speed = 2;
+
 	public bool ________________;
 
 	public MPhase 			mPhase = MPhase.idle;
 	public List<MouseInfo> 	mouseInfos = new List<MouseInfo>();
+
+	public bool 			walking = false; 
+	public Vector3 			walkTarget; 
+	public Transform 		characterTrans; 
 
 
 	void Awake()
 	{ 
 		S = this;
 		mPhase = MPhase.idle;
+
+		characterTrans = transform.Find("CharacterTrans");
 	}
 
 
@@ -156,6 +164,7 @@ public class Mage : PT_MonoBehaviour {
 	void MouseTap()
 	{
 		if (DEBUG) print("Mage.MouseTap()");
+		WalkTo(lastMouseInfo.loc);
 	}
 		
 	void MouseDrag()
@@ -166,5 +175,65 @@ public class Mage : PT_MonoBehaviour {
 	void MouseDragUp()
 	{
 		if (DEBUG) print("Mage.MouseDragUp()");
+	}
+
+
+	public void WalkTo(Vector3 xTarget)
+	{
+		walkTarget = xTarget; 
+		walkTarget.z = 0; 
+		walking = true; 
+		Face(walkTarget); 
+	}
+	
+	public void Face(Vector3 poi)
+	{ 
+		Vector3 delta = poi - pos;
+
+		float rZ = Mathf.Rad2Deg * Mathf.Atan2(delta.y, delta.x);
+
+		characterTrans.rotation = Quaternion.Euler(0, 0, rZ);
+	}
+	
+	public void StopWalking()
+	{ // Stops the _Mage from walking
+		walking = false;
+		GetComponent<Rigidbody>().velocity = Vector3.zero;
+	}
+
+
+	void FixedUpdate()
+	{ 
+		if (walking)
+		{ 
+			if ((walkTarget - pos).magnitude < speed * Time.fixedDeltaTime)
+			{
+				pos = walkTarget;
+				StopWalking();
+			}
+			else
+			{
+				rigidbody.velocity = (walkTarget - pos).normalized * speed;
+			}
+		}
+		else
+		{
+			rigidbody.velocity = Vector3.zero;
+		}
+	}
+
+
+	void OnCollisionEnter(Collision coll)
+	{
+		GameObject otherGO = coll.gameObject;
+
+		Tile ti = otherGO.GetComponent<Tile>();
+		if (ti != null)
+		{
+			if (ti.height > 0)
+			{ 
+				StopWalking();
+			}
+		}
 	}
 }
